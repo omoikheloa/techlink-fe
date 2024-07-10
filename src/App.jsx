@@ -1,35 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import Home from './pages/Home';
+import CreateEvent from './pages/CreateEvent';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Events from './pages/Events';
+import Sidebar from './components/Sidebar';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const isLoggedIn = true; // Change this based on your authentication logic
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <Router>
+      <div className="flex min-h-screen">
+        {isLoggedIn && <Sidebar />}
+        <div className="flex-1">
+          <header className="bg-white shadow-md py-4">
+            <div className="container mx-auto flex justify-between items-center">
+              <Link to="/" className="text-xl font-bold text-purple-700">TechLink</Link>
+              <nav className="space-x-4">
+                {!isLoggedIn && (
+                  <>
+                    <Link to="/login" className="text-gray-700 hover:text-purple-700">Login</Link>
+                    <Link to="/signup" className="text-gray-700 hover:text-purple-700">Sign Up</Link>
+                  </>
+                )}
+                {isLoggedIn && (
+                  <>
+                    <Link to="/addevent" className="text-gray-700 hover:text-purple-700">Add Event</Link>
+                    <Link to="/events" className="text-gray-700 hover:text-purple-700">Events</Link>
+                  </>
+                )}
+              </nav>
+            </div>
+          </header>
+          <main className="p-6">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/addevent" element={<CreateEvent />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/events" element={<Events />} />
+            </Routes>
+          </main>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    </Router>
+  );
+};
 
-export default App
+export default App;
