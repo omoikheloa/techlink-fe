@@ -94,3 +94,5 @@ For any questions or feedback, please reach out to me at [omoikheloa56@gmail.com
 
 
 ![Screenshot (147)](https://github.com/omoikheloa/techlink-fe/assets/142723098/6460b1a6-1af7-4309-bb13-bceed6f0e141)
+
+Live link to app - https://techlink-fe.vercel.app/
