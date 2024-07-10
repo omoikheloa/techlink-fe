@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Sidebar from '../components/Navbar';
 
 const CreateEvent = () => {
   const [formData, setFormData] = useState({
