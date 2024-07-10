@@ -30,11 +30,15 @@ const Events = () => {
   };
 
   return (
-    <div className="flex p-6 space-x-6">
-      <EventList events={events} onSelect={handleSelectEvent} onDelete={handleDeleteEvent} />
-      {selectedEvent && (
-        <EventDetails event={selectedEvent} onSave={handleSaveEvent} onCancel={handleCancel} />
-      )}
+    <div className="flex h-screen bg-gray-900 text-gray-200">
+      <div className="w-2/4 bg-gray-800 p-4 border-r border-gray-700 overflow-y-auto">
+        <EventList events={events} onSelect={handleSelectEvent} onDelete={handleDeleteEvent} />
+      </div>
+      <div className="w-2/4 p-4">
+        {selectedEvent && (
+          <EventDetails event={selectedEvent} onSave={handleSaveEvent} onCancel={handleCancel} />
+        )}
+      </div>
     </div>
   );
 };
