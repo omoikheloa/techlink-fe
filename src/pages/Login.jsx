@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 
 const Login = ({ onLogin }) => {
-  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onLogin(email, password);
+    setError(''); // Clear previous errors
+    try {
+      await onLogin(email, password);
+    } catch (loginError) {
+      setError(loginError.message);
+    }
   };
 
   return (

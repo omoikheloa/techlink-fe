@@ -2,16 +2,25 @@ import React, { useState } from 'react';
 import { supabase } from '../supabaseClient'; // Ensure this path is correct
 
 const Signup = () => {
+  const [fullname, setFullname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState(''); // Fixed typo
+  const [error, setError] = useState(''); // State variable for error messages
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
     try {
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
       alert('Signup successful! Please check your email for a confirmation link.');
+      setError(''); // Clear error if signup is successful
     } catch (error) {
+      setError(error.message); // Set error message
       console.error('Signup failed:', error.message);
     }
   };
