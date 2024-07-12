@@ -1,41 +1,18 @@
 import React, { useState } from 'react';
-import { Client, Account } from 'appwrite';
-import { useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient'; // Ensure this path is correct
 
 const Signup = () => {
-  const [fullname, setFullname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-
-  // Initialize Appwrite client and account outside of component
-  const client = new Client()
-    .setEndpoint('https://cloud.appwrite.io/v1')
-    .setProject('668d7e7b0027cdf95452');
-
-  const account = new Account(client);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (fullname === '' || email === '' || password === '' || confirmPassword === '') {
-      setError('Please enter all required details');
-    } else if (password !== confirmPassword) {
-      setError('Passwords do not match');
-    } else {
-      register();
-    }
-  };
-
-  const navigate = useNavigate();
-
-  const register = async () => {
     try {
-      await account.create('unique()', email, password, fullname);
-      navigate('/dashboard')
-      // Handle successful signup (e.g., redirect to login or dashboard)
-    } catch (err) {
-      setError(err.message);
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) throw error;
+      alert('Signup successful! Please check your email for a confirmation link.');
+    } catch (error) {
+      console.error('Signup failed:', error.message);
     }
   };
 

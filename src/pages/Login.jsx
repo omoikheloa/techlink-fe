@@ -1,17 +1,13 @@
 import React, { useState } from 'react';
 
 const Login = ({ onLogin }) => {
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await onLogin(email, password);
-    } catch (error) {
-      setError('Login failed. Please check your credentials.');
-    }
+    onLogin(email, password);
   };
 
   return (
