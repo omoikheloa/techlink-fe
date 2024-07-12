@@ -111,7 +111,7 @@ import About from './pages/About';
 
 // Initialize Appwrite client and account outside of the component
 const client = new Client()
-  .setEndpoint('https://cloud.appwrite.io/v1')
+  .setEndpoint('https://cloud.appwrite.io/v1/account/sessions/email')
   .setProject('668d7e7b0027cdf95452'); 
 
 const account = new Account(client);
