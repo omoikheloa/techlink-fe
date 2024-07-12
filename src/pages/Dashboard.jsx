@@ -1,5 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import firstEvent from '../images/fabio-oyXis2kALVg-unsplash.jpg';
+import manageEvent from '../images/ilya-pavlov-wbXdGS_D17U-unsplash.jpg';
+import exploreEvents from '../images/maxim-hopman-IayKLkmz6g0-unsplash.jpg';
+import profileSettings from '../images/georgia-de-lotz-5pJPhkS6Oxg-unsplash.jpg';
+// import viewTutorials from '../images/markus-winkler-HpWwEURimK8-unsplash.jpg';
+// import community from '../images/william-white-TZCppMjaOHU-unsplash.jpg';
 
 const Dashboard = () => {
   return (
@@ -11,25 +17,25 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-purple-600 bg-opacity-70 p-6 rounded-lg">
             <h2 className="text-3xl font-semibold mb-4">Create Your First Event</h2>
-            <img src="https://via.placeholder.com/300" alt="Create Event" className="mb-4 rounded" />
+            <img src={firstEvent} alt="Create Event" className="mb-4 rounded" />
             <p className="mb-4">Start by creating your first event and share it with the tech community.</p>
             <Link to="/add-event" className="bg-purple-700 hover:bg-purple-800 text-white py-2 px-4 rounded">Add Event</Link>
           </div>
           <div className="bg-purple-600 bg-opacity-70 p-6 rounded-lg">
             <h2 className="text-3xl font-semibold mb-4">Manage Your Events</h2>
-            <img src="https://via.placeholder.com/300" alt="Manage Event" className="mb-4 rounded" />
+            <img src={manageEvent} alt="Manage Event" className="mb-4 rounded" />
             <p className="mb-4">Keep track of your events, update details, and manage participants.</p>
             <Link to="/manage-event" className="bg-purple-700 hover:bg-purple-800 text-white py-2 px-4 rounded">Manage Event</Link>
           </div>
           <div className="bg-purple-600 bg-opacity-70 p-6 rounded-lg">
             <h2 className="text-3xl font-semibold mb-4">Explore Tech Events</h2>
-            <img src="https://via.placeholder.com/300" alt="Explore Events" className="mb-4 rounded" />
+            <img src={exploreEvents} alt="Explore Events" className="mb-4 rounded" />
             <p className="mb-4">Browse and RSVP to the latest tech events happening around you.</p>
             <Link to="/explore-events" className="bg-purple-700 hover:bg-purple-800 text-white py-2 px-4 rounded">Explore Events</Link>
           </div>
           <div className="bg-purple-600 bg-opacity-70 p-6 rounded-lg">
             <h2 className="text-3xl font-semibold mb-4">Profile Settings</h2>
-            <img src="https://via.placeholder.com/300" alt="Profile Settings" className="mb-4 rounded" />
+            <img src={profileSettings} alt="Profile Settings" className="mb-4 rounded h-60 w-full" />
             <p className="mb-4">Update your profile information and manage your account settings.</p>
             <Link to="/profile-settings" className="bg-purple-700 hover:bg-purple-800 text-white py-2 px-4 rounded">Profile Settings</Link>
           </div>
