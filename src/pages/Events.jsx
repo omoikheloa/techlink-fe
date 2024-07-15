@@ -1,28 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import EventList from '../components/EventList';
 import EventDetails from '../components/EventDetails';
+import { supabase } from '../supabaseClient';
 
 const Events = () => {
-  const [events, setEvents] = useState([
-    { id: 1, name: 'Tech Conference 2024', description: 'A conference about the latest in tech.' },
-    { id: 2, name: 'Music Festival', description: 'An outdoor music festival.' },
-  ]);
+  const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      let { data, error } = await supabase.from('events').select('*');
+      if (error) {
+        console.error(error);
+      } else {
+        setEvents(data);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   const handleSelectEvent = (event) => {
     setSelectedEvent(event);
   };
 
-  const handleDeleteEvent = (id) => {
-    setEvents(events.filter((event) => event.id !== id));
-    if (selectedEvent && selectedEvent.id === id) {
-      setSelectedEvent(null);
+  const handleDeleteEvent = async (id) => {
+    let { error } = await supabase.from('events').delete().eq('id', id);
+    if (error) {
+      console.error(error);
+    } else {
+      setEvents(events.filter((event) => event.id !== id));
+      if (selectedEvent && selectedEvent.id === id) {
+        setSelectedEvent(null);
+      }
     }
   };
 
-  const handleSaveEvent = (updatedEvent) => {
-    setEvents(events.map((event) => (event.id === updatedEvent.id ? updatedEvent : event)));
-    setSelectedEvent(null);
+  const handleSaveEvent = async (updatedEvent) => {
+    let { error } = await supabase
+      .from('events')
+      .update(updatedEvent)
+      .eq('id', updatedEvent.id);
+    if (error) {
+      console.error(error);
+    } else {
+      setEvents(events.map((event) => (event.id === updatedEvent.id ? updatedEvent : event)));
+      setSelectedEvent(null);
+    }
   };
 
   const handleCancel = () => {
