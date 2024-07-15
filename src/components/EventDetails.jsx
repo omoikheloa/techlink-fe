@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ArrowPathIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
 const EventDetails = ({ event, onSave, onCancel }) => {
-  const [editEvent, setEditEvent] = useState({ ...event });
-
-  useEffect(() => {
-    setEditEvent(event);
-  }, [event]);
+  const [editEvent, setEditEvent] = React.useState({ ...event });
 
   const handleChange = (e) => {
     setEditEvent({

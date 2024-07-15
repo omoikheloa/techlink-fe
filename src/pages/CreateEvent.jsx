@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { supabase } from '../supabaseClient'; // Adjust the import path based on your project structure
 
 const CreateEvent = () => {
   const [formData, setFormData] = useState({
@@ -24,9 +25,17 @@ const CreateEvent = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
+    
+    // Insert the new event into the database
+    const { data, error } = await supabase.from('events').insert([formData]);
+
+    if (error) {
+      console.error('Error inserting data:', error);
+    } else {
+      console.log('Event created successfully:', data);
+    }
   };
 
   return (

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { supabase } from '../supabaseClient'; // Ensure this path is correct
+import { supabase } from '../supabaseClient';
+import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   const [fullname, setFullname] = useState('');
@@ -7,6 +8,8 @@ const Signup = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState(''); // Fixed typo
   const [error, setError] = useState(''); // State variable for error messages
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,6 +21,7 @@ const Signup = () => {
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
       alert('Signup successful! Please check your email for a confirmation link.');
+      navigate ('/login')
       setError(''); // Clear error if signup is successful
     } catch (error) {
       setError(error.message); // Set error message

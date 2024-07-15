@@ -19,13 +19,13 @@ const Dashboard = () => {
             <h2 className="text-3xl font-semibold mb-4">Create Your First Event</h2>
             <img src={firstEvent} alt="Create Event" className="mb-4 rounded" />
             <p className="mb-4">Start by creating your first event and share it with the tech community.</p>
-            <Link to="/add-event" className="bg-purple-700 hover:bg-purple-800 text-white py-2 px-4 rounded">Add Event</Link>
+            <Link to="/create-event" className="bg-purple-700 hover:bg-purple-800 text-white py-2 px-4 rounded">Add Event</Link>
           </div>
           <div className="bg-purple-600 bg-opacity-70 p-6 rounded-lg">
             <h2 className="text-3xl font-semibold mb-4">Manage Your Events</h2>
             <img src={manageEvent} alt="Manage Event" className="mb-4 rounded" />
             <p className="mb-4">Keep track of your events, update details, and manage participants.</p>
-            <Link to="/manage-event" className="bg-purple-700 hover:bg-purple-800 text-white py-2 px-4 rounded">Manage Event</Link>
+            <Link to="/events" className="bg-purple-700 hover:bg-purple-800 text-white py-2 px-4 rounded">Manage Event</Link>
           </div>
           <div className="bg-purple-600 bg-opacity-70 p-6 rounded-lg">
             <h2 className="text-3xl font-semibold mb-4">Explore Tech Events</h2>
