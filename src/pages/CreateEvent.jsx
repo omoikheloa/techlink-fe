@@ -1,4 +1,10 @@
 import React, { useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client
+const supabaseUrl = 'YOUR_SUPABASE_URL';
+const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const CreateEvent = () => {
   const [formData, setFormData] = useState({
@@ -24,9 +30,20 @@ const CreateEvent = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .insert([formData]);
+
+      if (error) throw error;
+      console.log('Event created successfully:', data);
+      // You can add further actions here, such as showing a success message or redirecting the user
+    } catch (error) {
+      console.error('Error creating event:', error.message);
+      // Handle the error (e.g., show an error message to the user)
+    }
   };
 
   return (

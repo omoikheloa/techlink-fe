@@ -1,5 +1,4 @@
 import React from 'react';
-import { button } from 'react-router-dom';
 
 const Home = () => {
   return (
