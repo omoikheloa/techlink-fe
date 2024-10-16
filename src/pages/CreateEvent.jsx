@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { useNavigate } from 'react-router-dom';
 
 // Initialize Supabase client
 const supabaseUrl = 'https://fkwavphbckanbnbusifj.supabase.co';
@@ -7,6 +8,7 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const CreateEvent = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -15,14 +17,15 @@ const CreateEvent = () => {
     city: '',
     state: '',
     country: '',
-    startTime: '',
-    endTime: '',
+    start_time: '',
+    end_time: '',
     quantity: 0,
     price: 0,
-    startDate: '',
-    endDate: '',
+    start_date: '',
+    end_date: '',
   });
   const [flyer, setFlyer] = useState(null);
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     setFormData({
@@ -37,37 +40,43 @@ const CreateEvent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!flyer) {
+      setError('Please upload a flyer. It is required.');
+      return;
+    }
+
     try {
       // Upload flyer
-      let flyerUrl = null;
-      if (flyer) {
-        const fileExt = flyer.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
-        const { data: fileData, error: fileError } = await supabase.storage
-          .from('event-flyers')
-          .upload(fileName, flyer);
+      const fileExt = flyer.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const { data: fileData, error: fileError } = await supabase.storage
+        .from('event-flyers')
+        .upload(fileName, flyer);
 
-        if (fileError) throw fileError;
-        
-        // Get public URL for the uploaded file
-        const { data: urlData } = supabase.storage
-          .from('event-flyers')
-          .getPublicUrl(fileName);
-        
-        flyerUrl = urlData.publicUrl;
-      }
+      if (fileError) throw fileError;
+      
+      // Get public URL for the uploaded file
+      const { data: urlData } = supabase.storage
+        .from('event-flyers')
+        .getPublicUrl(fileName);
+      
+      const flyer_url = urlData.publicUrl;
 
       // Insert event data
       const { data, error } = await supabase
         .from('events')
-        .insert([{ ...formData, flyerUrl }]);
+        .insert([{ ...formData, flyer_url }]);
 
       if (error) throw error;
       console.log('Event created successfully:', data);
-      // You can add further actions here, such as showing a success message or redirecting the user
+      
+      // Redirect to events tab
+      navigate('/events');
     } catch (error) {
       console.error('Error creating event:', error.message);
-      // Handle the error (e.g., show an error message to the user)
+      setError('Error creating event. Please try again.');
     }
   };
 
@@ -75,13 +84,15 @@ const CreateEvent = () => {
     <div className="flex min-h-screen bg-gray-100">
       <div className="flex-1 p-8">
         <h1 className="text-3xl font-bold mb-8 text-purple-700">Create an Event</h1>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="bg-white p-6 rounded-md shadow-md">
-            <h2 className="text-2xl font-bold mb-4 text-gray-700">Upload Flyer</h2>
+          <div className="bg-white p-6 rounded-md shadow-md">
+            <h2 className="text-2xl font-bold mb-4 text-gray-700">Upload Flyer (Required)</h2>
             <input 
               type="file" 
               id="flyer" 
               onChange={handleFileChange}
+              required
               className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200" 
             />
           </div>
@@ -168,30 +179,30 @@ const CreateEvent = () => {
                 />
               </div>
               <div>
-                <label htmlFor="startTime" className="block text-sm font-medium text-gray-700">Start Time</label>
-                <input
-                  type="time"
-                  id="startTime"
-                  value={formData.startTime}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md"
-                />
-              </div>
-              <div>
-                <label htmlFor="endTime" className="block text-sm font-medium text-gray-700">End Time</label>
-                <input
-                  type="time"
-                  id="endTime"
-                  value={formData.endTime}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-md shadow-md">
-            <h2 className="text-2xl font-bold mb-4 text-gray-700">Ticket</h2>
-            <div className="space-y-4">
+                   <label htmlFor="start_time" className="block text-sm font-medium text-gray-700">Start Time</label>
+                   <input
+                     type="time"
+                     id="start_time"
+                     value={formData.start_time}
+                     onChange={handleChange}
+                     className="mt-1 block w-full border-gray-300 rounded-md"
+                   />
+                 </div>
+                 <div>
+                   <label htmlFor="end_time" className="block text-sm font-medium text-gray-700">End Time</label>
+                   <input
+                     type="time"
+                     id="end_time"
+                     value={formData.end_time}
+                     onChange={handleChange}
+                     className="mt-1 block w-full border-gray-300 rounded-md"
+                   />
+                 </div>
+               </div>
+             </div>
+             <div className="bg-white p-6 rounded-md shadow-md">
+               <h2 className="text-2xl font-bold mb-4 text-gray-700">Ticket</h2>
+               <div className="space-y-4">
               <div>
                 <label htmlFor="quantity" className="block text-sm font-medium text-gray-700">Quantity</label>
                 <input
@@ -213,36 +224,36 @@ const CreateEvent = () => {
                 />
               </div>
               <div>
-                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Sale Start Date</label>
-                <input
-                  type="date"
-                  id="startDate"
-                  value={formData.startDate}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md"
-                />
-              </div>
-              <div>
-                <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">Sale End Date</label>
-                <input
-                  type="date"
-                  id="endDate"
-                  value={formData.endDate}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex space-x-4">
-            <button type="submit" className="w-full py-2 text-white bg-purple-600 rounded-md hover:bg-purple-700">
-              Create Event
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
+                   <label htmlFor="start_date" className="block text-sm font-medium text-gray-700">Sale Start Date</label>
+                   <input
+                     type="date"
+                     id="start_date"
+                     value={formData.start_date}
+                     onChange={handleChange}
+                     className="mt-1 block w-full border-gray-300 rounded-md"
+                   />
+                 </div>
+                 <div>
+                   <label htmlFor="end_date" className="block text-sm font-medium text-gray-700">Sale End Date</label>
+                   <input
+                     type="date"
+                     id="end_date"
+                     value={formData.end_date}
+                     onChange={handleChange}
+                     className="mt-1 block w-full border-gray-300 rounded-md"
+                   />
+                 </div>
+               </div>
+             </div>
+             <div className="flex space-x-4">
+               <button type="submit" className="w-full py-2 text-white bg-purple-600 rounded-md hover:bg-purple-700">
+                 Create Event
+               </button>
+             </div>
+           </form>
+         </div>
+       </div>
+     );
+   };
 
-export default CreateEvent;
+   export default CreateEvent;

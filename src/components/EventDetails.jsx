@@ -42,7 +42,6 @@ const EventDetails = ({ event, onSave, onCancel }) => {
             className="mt-1 block w-full border-gray-300 rounded-md"
           />
         </div>
-        {/* Add more fields as needed */}
         <div className="flex space-x-4">
           <button
             className="w-full py-2 text-white bg-purple-600 rounded-md hover:bg-purple-700 flex items-center justify-center transition-colors duration-300"
