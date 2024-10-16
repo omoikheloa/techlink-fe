@@ -6,28 +6,45 @@ const Signup = () => {
   const [fullname, setFullname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState(''); // Fixed typo
-  const [error, setError] = useState(''); // State variable for error messages
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
       return;
     }
+
     try {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          data: {
+            full_name: fullname,
+          }
+        }
+      });
+
       if (error) throw error;
+
+      if (data?.user?.identities?.length === 0) {
+        setError('This email is already registered. Please try logging in instead.');
+        return;
+      }
+
       alert('Signup successful! Please check your email for a confirmation link.');
-      navigate ('/login')
-      setError(''); // Clear error if signup is successful
+      navigate('/login');
     } catch (error) {
-      setError(error.message); // Set error message
-      console.error('Signup failed:', error.message);
+      console.error('Signup error:', error);
+      setError(error.message || 'An unexpected error occurred');
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">

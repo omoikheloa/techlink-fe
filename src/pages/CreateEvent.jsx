@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
-const supabaseUrl = 'YOUR_SUPABASE_URL';
-const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+const supabaseUrl = 'https://fkwavphbckanbnbusifj.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZrd2F2cGhiY2thbmJuYnVzaWZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjA3ODc1NTEsImV4cCI6MjAzNjM2MzU1MX0.A4carmDiM8TwPNn5221KhOOybgfU_1Kxcs3bFI6Odtk';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const CreateEvent = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    category: 'Music',
+    category: 'frontend',
     address: '',
     city: '',
     state: '',
@@ -22,6 +22,7 @@ const CreateEvent = () => {
     startDate: '',
     endDate: '',
   });
+  const [flyer, setFlyer] = useState(null);
 
   const handleChange = (e) => {
     setFormData({
@@ -30,12 +31,36 @@ const CreateEvent = () => {
     });
   };
 
+  const handleFileChange = (e) => {
+    setFlyer(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Upload flyer
+      let flyerUrl = null;
+      if (flyer) {
+        const fileExt = flyer.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const { data: fileData, error: fileError } = await supabase.storage
+          .from('event-flyers')
+          .upload(fileName, flyer);
+
+        if (fileError) throw fileError;
+        
+        // Get public URL for the uploaded file
+        const { data: urlData } = supabase.storage
+          .from('event-flyers')
+          .getPublicUrl(fileName);
+        
+        flyerUrl = urlData.publicUrl;
+      }
+
+      // Insert event data
       const { data, error } = await supabase
         .from('events')
-        .insert([formData]);
+        .insert([{ ...formData, flyerUrl }]);
 
       if (error) throw error;
       console.log('Event created successfully:', data);
@@ -51,9 +76,14 @@ const CreateEvent = () => {
       <div className="flex-1 p-8">
         <h1 className="text-3xl font-bold mb-8 text-purple-700">Create an Event</h1>
         <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="bg-white p-6 rounded-md shadow-md">
+        <div className="bg-white p-6 rounded-md shadow-md">
             <h2 className="text-2xl font-bold mb-4 text-gray-700">Upload Flyer</h2>
-            <input type="file" id="cover" className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200" />
+            <input 
+              type="file" 
+              id="flyer" 
+              onChange={handleFileChange}
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200" 
+            />
           </div>
           <div className="bg-white p-6 rounded-md shadow-md">
             <h2 className="text-2xl font-bold mb-4 text-gray-700">General Information</h2>
@@ -206,10 +236,7 @@ const CreateEvent = () => {
           </div>
           <div className="flex space-x-4">
             <button type="submit" className="w-full py-2 text-white bg-purple-600 rounded-md hover:bg-purple-700">
-              Save draft
-            </button>
-            <button type="submit" className="w-full py-2 text-white bg-purple-600 rounded-md hover:bg-purple-700">
-              Next
+              Create Event
             </button>
           </div>
         </form>
