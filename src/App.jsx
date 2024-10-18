@@ -9,6 +9,7 @@ import Events from './pages/Events';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import About from './pages/About';
+import { Toaster } from 'react-hot-toast';
 
 // Initialize Supabase client
 const supabase = createClient('https://fkwavphbckanbnbusifj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZrd2F2cGhiY2thbmJuYnVzaWZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjA3ODc1NTEsImV4cCI6MjAzNjM2MzU1MX0.A4carmDiM8TwPNn5221KhOOybgfU_1Kxcs3bFI6Odtk');
@@ -18,6 +19,7 @@ const AppRoutes = ({ isLoggedIn, handleLogin, handleLogout }) => {
 
   return (
     <div>
+      <Toaster position='top-right' />
       <Navbar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
       <div className="flex-1">
         <main className="p-6">

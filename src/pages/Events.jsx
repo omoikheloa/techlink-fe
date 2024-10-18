@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 import EventList from '../components/EventList';
 import EventDetails from '../components/EventDetails';
 import { supabase } from '../supabaseClient';
@@ -7,13 +9,8 @@ const Events = () => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
@@ -21,40 +18,41 @@ const Events = () => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       setEvents(data);
     } catch (error) {
-      setError('Error fetching events: ' + error.message);
+      toast.error(`Error fetching events: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const handleSelectEvent = (event) => {
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
+
+  const handleSelectEvent = useCallback((event) => {
     setSelectedEvent(event);
-  };
+  }, []);
 
-  const handleAddEvent = async (newEvent) => {
+  const handleAddEvent = useCallback(async (newEvent) => {
     try {
       const { data, error } = await supabase
         .from('events')
         .insert([newEvent])
         .single();
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
-      setEvents([data, ...events]);
+      setEvents((prevEvents) => [data, ...prevEvents]);
+      toast.success('Event added successfully!');
     } catch (error) {
-      setError('Error adding event: ' + error.message);
+      toast.error(`Error adding event: ${error.message}`);
     }
-  };
+  }, []);
 
-  const handleSaveEvent = async (updatedEvent) => {
+  const handleSaveEvent = useCallback(async (updatedEvent) => {
     try {
       const { data, error } = await supabase
         .from('events')
@@ -62,66 +60,86 @@ const Events = () => {
         .eq('id', updatedEvent.id)
         .single();
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
-      setEvents(events.map((event) => (event.id === updatedEvent.id ? data : event)));
+      setEvents((prevEvents) => 
+        prevEvents.map((event) => (event.id === updatedEvent.id ? data : event))
+      );
       setSelectedEvent(null);
+      toast.success('Event updated successfully!');
     } catch (error) {
-      setError('Error updating event: ' + error.message);
+      toast.error(`Error updating event: ${error.message}`);
     }
-  };
+  }, []);
 
-  const handleDeleteEvent = async (id) => {
+  const handleDeleteEvent = useCallback(async (id) => {
     try {
       const { error } = await supabase
         .from('events')
         .delete()
         .eq('id', id);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
-      setEvents(events.filter((event) => event.id !== id));
+      setEvents((prevEvents) => prevEvents.filter((event) => event.id !== id));
       if (selectedEvent && selectedEvent.id === id) {
         setSelectedEvent(null);
       }
+      toast.success('Event deleted successfully!');
     } catch (error) {
-      setError('Error deleting event: ' + error.message);
+      toast.error(`Error deleting event: ${error.message}`);
     }
-  };
+  }, [selectedEvent]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setSelectedEvent(null);
-  };
+  }, []);
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen bg-gray-900 text-gray-200">Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="flex justify-center items-center h-screen bg-gray-900 text-gray-200">{error}</div>;
+    return (
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="flex justify-center items-center h-screen bg-gray-900 text-gray-200"
+      >
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
+      </motion.div>
+    );
   }
 
   return (
-    <div className="flex h-screen bg-gray-900 text-gray-200">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="flex h-screen bg-gray-900 text-gray-200"
+    >
       <div className="w-2/4 bg-gray-800 p-4 border-r border-gray-700 overflow-y-auto">
         <EventList events={events} onSelect={handleSelectEvent} onDelete={handleDeleteEvent} />
-        <button
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => handleAddEvent({ name: 'New Event', description: 'New event description' })}
           className="bg-green-500 text-white px-4 py-2 mt-4 rounded hover:bg-green-600 transition-colors"
         >
           Add Event
-        </button>
+        </motion.button>
       </div>
-      <div className="w-2/4 p-4">
+      <AnimatePresence>
         {selectedEvent && (
-          <EventDetails event={selectedEvent} onSave={handleSaveEvent} onCancel={handleCancel} />
+          <motion.div 
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="w-2/4 p-4"
+          >
+            <EventDetails event={selectedEvent} onSave={handleSaveEvent} onCancel={handleCancel} />
+          </motion.div>
         )}
-      </div>
-    </div>
+      </AnimatePresence>
+    </motion.div>
   );
 };
 
