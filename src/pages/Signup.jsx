@@ -3,35 +3,70 @@ import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
-  const [fullname, setFullname] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [formData, setFormData] = useState({
+    fullname: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
   const [error, setError] = useState('');
-
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+    // Clear error when user starts typing
+    setError('');
+  };
+
+  const validateForm = () => {
+    if (!formData.fullname.trim()) {
+      setError('Full name is required');
+      return false;
+    }
+    if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return false;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return false;
+    }
+    return true;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    if (!validateForm()) return;
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
-
+    setIsLoading(true);
     try {
       const { data, error } = await supabase.auth.signUp({ 
-        email, 
-        password,
+        email: formData.email, 
+        password: formData.password,
         options: {
           data: {
-            full_name: fullname,
+            full_name: formData.fullname,
           }
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes('not authorized')) {
+          setError('This email domain is not authorized. Please use an allowed email domain.');
+        } else {
+          throw error;
+        }
+        return;
+      }
 
       if (data?.user?.identities?.length === 0) {
         setError('This email is already registered. Please try logging in instead.');
@@ -43,56 +78,86 @@ const Signup = () => {
     } catch (error) {
       console.error('Signup error:', error);
       setError(error.message || 'An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-md shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6">Sign Up</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="fullname" className="block text-sm font-medium text-gray-700">Full Name</label>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-gray-900">Create an Account</h2>
+        
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="fullname" className="block text-sm font-medium text-gray-700">
+              Full Name
+            </label>
             <input
               type="text"
               id="fullname"
-              value={fullname}
-              onChange={(e) => setFullname(e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md"
+              value={formData.fullname}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+              required
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md"
+              value={formData.email}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+              required
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
             <input
               type="password"
               id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md"
+              value={formData.password}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+              required
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
+
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              Confirm Password
+            </label>
             <input
               type="password"
               id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+              required
             />
           </div>
-          {error && <p className="mb-4 text-red-500 text-sm">{error}</p>}
-          <button type="submit" className="w-full py-2 text-white bg-purple-600 rounded-md hover:bg-purple-700">Sign Up</button>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? 'Creating Account...' : 'Sign Up'}
+          </button>
         </form>
       </div>
     </div>
