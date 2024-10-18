@@ -4,11 +4,13 @@ import { toast } from 'react-hot-toast';
 import EventList from '../components/EventList';
 import EventDetails from '../components/EventDetails';
 import { supabase } from '../supabaseClient';
+import { useNavigate } from 'react-router-dom';
 
 const Events = () => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   const fetchEvents = useCallback(async () => {
     setIsLoading(true);
@@ -120,7 +122,7 @@ const Events = () => {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => handleAddEvent({ name: 'New Event', description: 'New event description' })}
+          onClick={() => navigate('/create-event')}
           className="bg-green-500 text-white px-4 py-2 mt-4 rounded hover:bg-green-600 transition-colors"
         >
           Add Event
