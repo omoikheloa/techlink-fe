@@ -44,43 +44,43 @@ const Signup = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-  
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signUp({ 
-        email: formData.email, 
-        password: formData.password,
-        options: {
-          data: {
-            full_name: formData.fullname,
-          }
+  e.preventDefault();
+  if (!validateForm()) return;
+
+  setIsLoading(true);
+  try {
+    const { data, error } = await supabase.auth.signUp({ 
+      email: formData.email, 
+      password: formData.password,
+      options: {
+        data: {
+          full_name: formData.fullname,
         }
-      });
-  
-      // Log the full error and data for debugging
-      console.log('Signup attempt:', { data, error });
-  
-      if (error) {
-        setError(error.message); // Show the actual error message
-        return;
       }
-  
-      if (data?.user?.identities?.length === 0) {
-        setError('This email is already registered. Please try logging in instead.');
-        return;
-      }
-  
-      alert('Signup successful! Please check your email for a confirmation link.');
-      navigate('/login');
-    } catch (error) {
-      console.error('Signup error:', error);
-      setError(error.message || 'An unexpected error occurred');
-    } finally {
-      setIsLoading(false);
+    });
+
+    // Log the full error and data for debugging
+    console.log('Signup attempt:', { data, error });
+
+    if (error) {
+      setError(error.message); // Show the actual error message
+      return;
     }
-  };
+
+    if (data?.user?.identities?.length === 0) {
+      setError('This email is already registered. Please try logging in instead.');
+      return;
+    }
+
+    alert('Signup successful! Please check your email for a confirmation link.');
+    navigate('/login');
+  } catch (error) {
+    console.error('Signup error:', error);
+    setError(error.message || 'An unexpected error occurred');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
