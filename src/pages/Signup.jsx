@@ -46,7 +46,7 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-
+  
     setIsLoading(true);
     try {
       const { data, error } = await supabase.auth.signUp({ 
@@ -58,21 +58,20 @@ const Signup = () => {
           }
         }
       });
-
+  
+      // Log the full error and data for debugging
+      console.log('Signup attempt:', { data, error });
+  
       if (error) {
-        if (error.message.includes('not authorized')) {
-          setError('This email domain is not authorized. Please use an allowed email domain.');
-        } else {
-          throw error;
-        }
+        setError(error.message); // Show the actual error message
         return;
       }
-
+  
       if (data?.user?.identities?.length === 0) {
         setError('This email is already registered. Please try logging in instead.');
         return;
       }
-
+  
       alert('Signup successful! Please check your email for a confirmation link.');
       navigate('/login');
     } catch (error) {
